@@ -1,0 +1,2 @@
+from imx500_zoo.trainers.classification_trainer import ClassificationTrainer
+from imx500_zoo.trainers.nanodet_plus_trainer import NanodetPlusTrainer

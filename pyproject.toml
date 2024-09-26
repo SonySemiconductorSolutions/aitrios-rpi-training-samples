@@ -1,0 +1,32 @@
+[build-system]
+requires = ['setuptools>=61.0', "wheel"]
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'imx500_zoo'
+description = 'IMX500_Zoo'
+readme = 'README.md'
+version = '1.0.0'
+dependencies = [
+ 'model-compression-toolkit == 2.1.0',
+ 'torch == 2.1.2',
+ 'torchvision == 0.16.2',
+ 'torchinfo == 1.8.0',
+ 'lightning == 2.1.3',
+ 'onnx == 1.14.1',
+ 'onnxruntime == 1.15.1',
+ 'onnxruntime-extensions == 0.10.1',
+ 'tensorflow == 2.13.1',
+ 'pycocotools == 2.0.7',
+ 'albumentations == 1.3.1',
+ 'tabulate',
+]
+
+[project.scripts]
+imx500_zoo = 'imx500_zoo:main_imx500_zoo'
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+pythonpath = ["."]
+testpaths = ["_private/tests"]
+
