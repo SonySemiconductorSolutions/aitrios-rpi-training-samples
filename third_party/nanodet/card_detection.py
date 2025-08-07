@@ -24,7 +24,7 @@ try:  # for setup_retrain()
     from nanodet.data.collate import naive_collate
     from nanodet.evaluator import build_evaluator
 except ImportError as e:  # package not installed, skip
-    print('  Warning : nanodet is not installed, "pip install ."')
+    print(f'  Warning : nanodet is not installed, "pip install ." : {e}')
 
 
 class CardDetection:

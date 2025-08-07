@@ -27,7 +27,7 @@ try:  # for setup_pretrained()
         mkdir,
     )
 except ImportError as e:  # package not installed, skip
-    print('  Warning : nanodet is not installed, "pip install ."')
+    print(f'  Warning : nanodet is not installed, "pip install ." : {e}')
 
 
 class NanodetPlus:

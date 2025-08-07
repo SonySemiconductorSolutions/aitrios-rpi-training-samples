@@ -13,14 +13,12 @@ class OnnxClassificationValidator:
         self.onnx_path = self.config["PATH"]["ONNX"]
         self.report_path = self.config["PATH"]["ONNX_SUMMARY"]
         self.quantized_onnx_path = self.config["PATH"]["QUANTIZED_ONNX"]
-        self.quantized_report_path = self.config["PATH"][
-            "QUANTIZED_ONNX_SUMMARY"
-        ]
+        self.quantized_report_path = self.config["PATH"]["QUANTIZED_ONNX_SUMMARY"]
 
     def select_model(self, quantized=True):
         fpath = self.quantized_onnx_path if quantized else self.onnx_path
-        self.model, self.session, self.input_name, self.output_name = (
-            self.load_model(fpath, quantized)
+        self.model, self.session, self.input_name, self.output_name = self.load_model(
+            fpath, quantized
         )
 
     def load_model(self, onnx_path, quantized=True):
@@ -48,9 +46,7 @@ class OnnxClassificationValidator:
         if torch.is_tensor(image):
             image = image.detach().numpy()
         # inference
-        result = self.session.run(
-            [self.output_name], {self.input_name: [image]}
-        )
+        result = self.session.run([self.output_name], {self.input_name: [image]})
 
         return np.argmax(result)
 
@@ -60,13 +56,9 @@ class OnnxClassificationValidator:
 
         for i, (inputs, labels) in enumerate(dataloader):
             inputs = inputs.detach().numpy()
-            results = self.session.run(
-                [self.output_name], {self.input_name: inputs}
-            )[0]
+            results = self.session.run([self.output_name], {self.input_name: inputs})[0]
             # Accuracy
-            results = torch.from_numpy(
-                results.astype(np.float32)
-            ).clone()  # to tensor
+            results = torch.from_numpy(results.astype(np.float32)).clone()  # to tensor
             classifications = torch.argmax(results, dim=1)
             correct_predictions = sum(classifications == labels).item()
             correct_valid_sum += correct_predictions
@@ -77,13 +69,11 @@ class OnnxClassificationValidator:
         return acc_valid_average
 
     def show_model(self, quantize=True):
-
         with open(self.report_path, "w") as f:
             onnx.checker.check_model(self.model)
             f.write(onnx.helper.printable_graph(self.model.graph))
 
     def validate(self, dataloader):
-
         self.select_model(quantized=False)
         before_acc = self.validate_dataset(dataloader)
         self.select_model(quantized=True)

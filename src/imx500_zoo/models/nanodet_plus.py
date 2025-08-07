@@ -5,6 +5,7 @@ import torch
 import os
 
 from imx500_zoo import utilities
+from imx500_zoo.utilities.misc import EmptyClass
 
 from third_party.mct.nanodet_keras_model import (
     nanodet_plus_m,
@@ -22,7 +23,7 @@ class NanodetPlus:
     def __init__(self, config):
         # call from imx500_zoo.py/Solution.setup_model()
         if not hasattr(config, "nanodet"):
-            config.nanodet = empty_class()
+            config.nanodet = EmptyClass()
         self.config = config
 
         self.n = NN.NanodetPlus(config)
@@ -41,7 +42,7 @@ class NanodetPlus:
             self._setup_retrain()
         else:
             self.setup_pretrained(is_dl=True)
-                
+
     def _setup_retrain(self):
         self.n.setup_retrain()
 
@@ -61,9 +62,7 @@ class NanodetPlus:
         if is_dl:
             self._download_weights(self.pretrained_weights_path)
 
-        pretrained_weights_file = os.path.join(
-            self.pretrained_weights_path, pth_file
-        )
+        pretrained_weights_file = os.path.join(self.pretrained_weights_path, pth_file)
         self._setup_class_num()
         pretrained_weights = torch.load(
             pretrained_weights_file, map_location=torch.device("cpu")
@@ -78,9 +77,7 @@ class NanodetPlus:
         load_state_dict(self.keras_model, state_dict_torch=pretrained_weights)
 
         # Add Nanodet Box decoding layer (decode the model outputs to bounding box coordinates)
-        scores, boxes = nanodet_box_decoding(
-            self.keras_model.output, res=input_size
-        )
+        scores, boxes = nanodet_box_decoding(self.keras_model.output, res=input_size)
 
         # Add Tensorflow NMS layer
         self.outputs = tf.image.combined_non_max_suppression(
@@ -99,7 +96,7 @@ class NanodetPlus:
             num = self.config["MODEL"]["CLASS_NUM"]
             set_nanodet_classes(int(num))
         except Exception as e:
-            print(f"  Warning : MODEL.CLASS_NUM is not set, default 80")
+            print(f"  Warning : MODEL.CLASS_NUM is not set, default 80 : {e}")
 
     def get(self):
         return self.keras_model
@@ -112,7 +109,7 @@ class NanodetPlus:
 
     def _exists_model(self):
         is_exist = os.path.exists(self.config["PATH"]["KERAS"])
-        
+
         return is_exist
 
     def export_keras(self, target_path):
@@ -122,7 +119,3 @@ class NanodetPlus:
             name="Nanodet_plus_m_1.5x_416",
         )
         self.keras_model.save(target_path)
-
-
-class empty_class:
-    pass

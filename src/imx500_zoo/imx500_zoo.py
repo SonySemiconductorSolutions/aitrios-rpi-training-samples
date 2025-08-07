@@ -1,7 +1,7 @@
 # coding: utf-8
 
-import sys, os
-import re
+import sys
+import os
 import datetime
 
 import configparser
@@ -14,6 +14,7 @@ import imx500_zoo.datasets
 import imx500_zoo.trainers
 import imx500_zoo.quantizers
 import imx500_zoo.utilities
+import imx500_zoo.utilities.misc
 import imx500_zoo.validators
 
 
@@ -23,9 +24,7 @@ class Solution:
         self.config_file_path = config_file_path
         self.config = configparser.ConfigParser()
         self.config.read(self.config_file_path, encoding="utf-8")
-        self.solution_name = os.path.basename(
-            self.config_file_path
-        )  # basename
+        self.solution_name = os.path.basename(self.config_file_path)  # basename
         self.solution_name = os.path.splitext(self.solution_name)[
             0
         ]  # without extention
@@ -46,6 +45,8 @@ class Solution:
         self.validate_enable = self.config["SOLUTION"]["VALIDATE"]
 
         self._setup_target_pathes()
+        self._setup_dirs()
+        self._setup_results()
         self._setup_model()
         self._setup_data()
         self._setup_trainer()
@@ -55,24 +56,18 @@ class Solution:
     def _setup_validator(self):
         if self.config.is_validate:
             validator_name = self.config["VALIDATOR"]["NAME"]
-            self.validator = self._setup_module(
-                validator_name, imx500_zoo.validators
-            )
+            self.validator = self._setup_module(validator_name, imx500_zoo.validators)
         else:
             self.validator = None
 
     def _setup_quantizer(self):
         quantizer_name = self.config["QUANTIZER"]["NAME"]
-        self.quantizer = self._setup_module(
-            quantizer_name, imx500_zoo.quantizers
-        )
+        self.quantizer = self._setup_module(quantizer_name, imx500_zoo.quantizers)
 
     def _setup_trainer(self):
         if self.retrain_enable == "True":
             trainer_name = self.config["TRAINER"]["NAME"]
-            self.trainer = self._setup_module(
-                trainer_name, imx500_zoo.trainers
-            )
+            self.trainer = self._setup_module(trainer_name, imx500_zoo.trainers)
         else:
             self.trainer = None
 
@@ -81,7 +76,7 @@ class Solution:
 
         # dataset inside imx500_zoo
         self.dataset = self._setup_module(data_name, imx500_zoo.datasets)
-        if self.dataset == None:  # can not found
+        if self.dataset is None:  # can not found
             print("Can't find the dataset: ", data_name)
             exit()
         self.update_data(self.dataset)
@@ -104,7 +99,7 @@ class Solution:
     def _setup_module(self, module_name, modules):
         ret = None
         for m in [modules]:
-            if None != getattr(m, module_name, None):
+            if None is not getattr(m, module_name, None):
                 ret = getattr(m, module_name)(self.config)
                 break
         return ret
@@ -116,25 +111,18 @@ class Solution:
         os.makedirs(target_folder, exist_ok=True)
 
         if self.retrain_enable == "True":
-            self.trainer.fit(
-                self.model, self.dataloader_train, self.dataloader_valid
-            )
-            if self.framework == "pytorch":
-                    self.model.export_onnx(self.config["PATH"]["ONNX"])
-            elif self.framework == "keras":
-                self.model.export_keras(self.config["PATH"]["KERAS"])
+            self.trainer.fit(self.model, self.dataloader_train, self.dataloader_valid)
         else:
-            if self.framework == "pytorch":
-                self.model.export_onnx(self.config["PATH"]["ONNX"])
-            elif self.framework == "keras":
-                self.model.export_keras(self.config["PATH"]["KERAS"])
             print("Skip Retraining")
+
+        if self.framework == "pytorch":
+            self.model.export_onnx(self.config["PATH"]["ONNX"])
+        elif self.framework == "keras":
+            self.model.export_keras(self.config["PATH"]["KERAS"])
 
     def quantize(self):
         print("[IMX500_zoo] Quantize")
-        self.quantizer.quantize(
-            self.model.get_trained_model(), self.dataloader_quant
-        )
+        self.quantizer.quantize(self.model.get_trained_model(), self.dataloader_quant)
 
     def validate(self):
         print("[IMX500_zoo] Validate")
@@ -165,9 +153,7 @@ class Solution:
         # MODEL PATHES
         model_name = self.config["SOLUTION"]["NAME"]
 
-        target_folder = (
-            self.config["PATH"]["MODEL_ROOT"] + "/" + model_name + "/"
-        )
+        target_folder = self.config["PATH"]["MODEL_ROOT"] + "/" + model_name + "/"
         self.config["PATH"]["MODEL"] = target_folder
 
         if self.framework == "pytorch":
@@ -184,9 +170,7 @@ class Solution:
             )
 
         elif self.framework == "keras":
-            self.config["PATH"]["KERAS"] = (
-                target_folder + model_name + ".keras"
-            )
+            self.config["PATH"]["KERAS"] = target_folder + model_name + ".keras"
             self.config["PATH"]["KERAS_SUMMARY"] = (
                 target_folder + model_name + "_keras_summary.txt"
             )
@@ -200,18 +184,32 @@ class Solution:
 
         # DATASET PATHES
         data_name = self.config["DATASET"]["NAME"]
-        self.config["PATH"]["DATA"] = (
-            self.config["PATH"]["DATA_ROOT"] + "/" + data_name
-        )
+        self.config["PATH"]["DATA"] = self.config["PATH"]["DATA_ROOT"] + "/" + data_name
+
+    def _setup_dirs(self):
+        path = self.config["PATH"]
+        dirs = [
+            path["MODEL"],
+            path["DATA"],
+            path["LOG"],
+        ]
+
+        for d in dirs:
+            os.makedirs(d, exist_ok=True)
+
+    def _setup_results(self):
+        results = imx500_zoo.utilities.misc.EmptyClass()
+        results.train = {}
+        results.quant = {}
+        results.valid = {}
+        self.config.results = results
 
     def _parse_config(self):
         self.retrain_enable = self.config["SOLUTION"]["RETRAIN"]
         self.validate_enable = self.config["SOLUTION"]["VALIDATE"]
         self.framework = self.config["SOLUTION"]["FRAMEWORK"]
 
-        self.config.is_retrain = self._config_value(
-            "SOLUTION", "RETRAIN", is_bool=True
-        )
+        self.config.is_retrain = self._config_value("SOLUTION", "RETRAIN", is_bool=True)
         self.config.is_validate = self._config_value(
             "SOLUTION", "VALIDATE", is_bool=True
         )
@@ -234,14 +232,15 @@ class Solution:
 
     def _tobool(self, str, true="true"):
         return str.lower().__contains__(true.lower())
-    
+
     def _exist_quantized_model(self):
         if self.framework == "pytorch":
             is_exist = os.path.exists(self.config["PATH"]["QUANTIZED_ONNX"])
         elif self.framework == "keras":
             is_exist = os.path.exists(self.config["PATH"]["QUANTIZED_KERAS"])
-        
+
         return is_exist
+
 
 def main_imx500_zoo():
     if len(sys.argv) == 2 or 3:
@@ -255,21 +254,23 @@ def main_imx500_zoo():
         print("Usage: imx500_zoo [config.ini]")
         exit()
 
-def main_cli(config_file_path=None, dump_file_name=None):
-    config = config_file_path
-        
-    solution = Solution(config)
-    solution.setup()
-    solution.train()
-    solution.quantize()
-    validate_results = solution.validate()
 
-    if dump_file_name is not None:
-        imx500_zoo.utilities.dump_json(
-            dump_file_name,
-            solution, 
-            validate_results
-        )
+def main_cli(config_file_path=None, dump_file_name=None):
+    if dump_file_name is None:
+        d = datetime.datetime.today().strftime("%Y%m%d_%H%M%S")
+        f = os.path.splitext(os.path.basename(config_file_path))[0]
+        dump_file_name = f"{d}_{f}"
+
+    solution = Solution(config_file_path)
+    validate_results = None
+    try:
+        solution.setup()
+        solution.train()
+        solution.quantize()
+        validate_results = solution.validate()
+    finally:
+        imx500_zoo.utilities.dump_json(dump_file_name, solution, validate_results)
+
 
 if __name__ == "__main__":
     main_cli("nanodet_plus_as_is.ini")

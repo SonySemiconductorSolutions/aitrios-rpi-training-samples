@@ -1,0 +1,19 @@
+---
+    backbone: 'mobilenetv2' #mobilenetv2
+    
+    train_param: {
+        gpu_id: 0
+    }
+    
+    model_name: 'original'
+    model_param: {  
+        classes: {
+            0: "background", # first is always background
+            1: "circle",
+            2: "triangle",
+            3: "rectanble",
+            4: "void", # last is always void, as len() = num_class + 1
+        }
+    }
+
+    data_rootpath: "./data/CardSegmentation/card"

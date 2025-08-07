@@ -18,9 +18,7 @@ class ClassificationTrainer:
         # Preperations
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.criterion = torch.nn.CrossEntropyLoss()
-        self.optimizer = torch.optim.Adam(
-            self.torch_model.parameters(), lr=self.lr
-        )
+        self.optimizer = torch.optim.Adam(self.torch_model.parameters(), lr=self.lr)
         self.dataloader_train = dataloader_train
         self.dataloader_valid = dataloader_valid
 
@@ -77,9 +75,7 @@ class ClassificationTrainer:
                 loss_valid = self.criterion(outputs_valid, labels_valid)
                 # Accuracy
                 classifications = torch.argmax(outputs_valid, dim=1)
-                correct_predictions = sum(
-                    classifications == labels_valid
-                ).item()
+                correct_predictions = sum(classifications == labels_valid).item()
                 correct_valid_sum += correct_predictions
                 # Log
                 loss_valid_sum += loss_valid.item()

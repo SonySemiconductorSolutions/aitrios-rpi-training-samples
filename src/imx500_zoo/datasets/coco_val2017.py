@@ -42,9 +42,7 @@ class CocoVal2017:
         self.download_dataset(self.data_path)
 
         dataset_folder = self.data_path + "/val2017"
-        annotation_file_path = (
-            self.data_path + "/annotations/instances_val2017.json"
-        )
+        annotation_file_path = self.data_path + "/annotations/instances_val2017.json"
         self.dataloader_quant, self.dataloader_eval = self.load_dataset(
             dataset_folder, annotation_file_path
         )

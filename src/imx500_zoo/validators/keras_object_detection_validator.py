@@ -15,12 +15,8 @@ class KerasObjectDetectionValidator:
         self.keras_path = self.config["PATH"]["KERAS"]
         self.report_path = self.config["PATH"]["KERAS_SUMMARY"]
         self.quantized_keras_path = self.config["PATH"]["QUANTIZED_KERAS"]
-        self.quantized_report_path = self.config["PATH"][
-            "QUANTIZED_KERAS_SUMMARY"
-        ]
-        self.valid_score_threshold = float(
-            self.config["VALIDATOR"]["SCORE_THRESHOLD"]
-        )
+        self.quantized_report_path = self.config["PATH"]["QUANTIZED_KERAS_SUMMARY"]
+        self.valid_score_threshold = float(self.config["VALIDATOR"]["SCORE_THRESHOLD"])
         self.data_path = self.config["PATH"]["DATA"]
         self.input_size = int(self.config["MODEL"]["INPUT_SIZE"])
         self.dataset_name = self.config["DATASET"]["NAME"]
@@ -100,10 +96,6 @@ class KerasObjectDetectionValidator:
     def show_bbox(self, draw, bbox, text, textcolor, bbcolor):
         font = ImageFont.truetype("arial.ttf", 10)
         textbox = draw.multiline_textbbox((bbox[0], bbox[1]), text, font)
-        bbox_w = bbox[2]
-        bbox_h = bbox[3]
-        text_w = textbox[2] - textbox[0]
-        text_h = textbox[3] - textbox[1]
         textarea = (bbox[0], bbox[1], textbox[2], textbox[3])
         draw.rectangle(
             (bbox[0], bbox[1], bbox[0] + bbox[2], bbox[1] + bbox[3]),
@@ -126,10 +118,7 @@ class KerasObjectDetectionValidator:
         for images, targets in dataloader:
             outputs = self.model(images)
             coco_metric.add_batch_detections(
-                outputs, 
-                targets, 
-                is_coco, 
-                self.valid_score_threshold
+                outputs, targets, is_coco, self.valid_score_threshold
             )
 
         return coco_metric.result(quantized)[0]

@@ -25,6 +25,6 @@ COPY ./ /work
 WORKDIR /work
 RUN pip install --upgrade pip \
 && pip install --upgrade setuptools \
-&& pip install .
-
+&& pip install . \
+&& pip install -e third_party/nanodet/nanodet
 RUN mkdir -p /home/$USER

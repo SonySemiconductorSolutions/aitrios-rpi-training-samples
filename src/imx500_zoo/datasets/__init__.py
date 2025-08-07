@@ -4,3 +4,6 @@ from imx500_zoo.datasets.card_detection import CardDetection
 from imx500_zoo.datasets.albu_imagefolder import AlbuImageFolder
 from imx500_zoo.datasets.coco_val2017 import CocoVal2017
 from imx500_zoo.datasets.imagenet import ImageNet
+from imx500_zoo.datasets.arrow_posenet import ArrowPosenet
+from imx500_zoo.datasets.default_posenet import DefaultPosenet
+from imx500_zoo.datasets.card_segmentation import CardSegmentation
