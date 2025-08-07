@@ -5,9 +5,8 @@ from imx500_zoo import utilities
 from torchvision import transforms
 
 
-DOWNLOAD_DATASET = (
-    r"https://github.com/SonySemiconductorSolutions/aitrios-rpi-dataset-sample/raw/refs/heads/main/card_classification.zip"
-)
+DOWNLOAD_DATASET = r"https://github.com/SonySemiconductorSolutions/aitrios-rpi-dataset-sample/raw/refs/heads/main/card_classification.zip"
+
 
 class CardClassification:
     def __init__(self, config):
@@ -18,7 +17,7 @@ class CardClassification:
             DOWNLOAD_DATASET,
             data_path,
             "train_data",
-            target_name="card_classification.zip"
+            target_name="card_classification.zip",
         )
 
     def setup(self):

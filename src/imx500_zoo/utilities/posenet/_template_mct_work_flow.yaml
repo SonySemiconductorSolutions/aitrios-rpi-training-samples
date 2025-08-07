@@ -1,0 +1,70 @@
+ROOT_FOLDER: "." #base folder path where yaml file is present
+SDSP_TOOL_CHAIN_PATH: "resources/sdsp_converter/v3.9.1/Toolchain"
+MCT_WORK_FLOW:
+  KEYPOINTS:
+    MODEL1:
+      NAME: "coco"
+      IS_LOCAL_WEIGHTS: True
+      DATASET:
+        NAME: "423_mct_tflite_int8"
+        TEST_DATA_FOLDER: 
+        ANNO_FILE: 
+        REPRESENTATIVE_DATA_PATH: 
+        CLASS_NAMES_PATH: # stub
+        CONFIG_FILE_PATH: # stub
+
+      MCT_WORKFLOW:
+        MODEL_PATH: 
+        INPUT_SIZE: 
+        NB_CLASSES: 
+        H5_INFER:
+          ENABLE: False     # Enable to evaluate on H5 model (AI_model_1)
+        TFLITE_EVAL:
+          ENABLE: False     # Enable to evaluate tflite model
+          PATH:
+        FLOAT32:
+          ENABLE: False     # Enable to convert h5 model to fp32 model
+        MCT_INT8_CPU:
+          ENABLE: False     # Enabled to convert h5 model to fp32_io_int8 tflite model (AI_model_2) and evaluate
+        MCT_INT8_IMX500:
+          ENABLE: True      # Enable to convert h5 model to mct tflite model (AI_model_3) and evaluate
+        EMET_FLOW:
+          ENABLE: False     # Enable to infer on IMX500 which is attached to raspi.(set EMET config[Line 177-141] before running)
+EMET:
+  SMART_SPLIT: false
+  LOG_LEVEL: DETAIL
+  BOARDS:
+    - BOARD1:
+        ENABLE: true
+        BOARD_NAME: 
+        HOST: 
+        USERNAME: 
+        SC_T2R_ROOT_DIR: 
+        MODULE_TYPE: 
+        TYPE2_GPIO: true
+  MODELS:
+    - MODEL1:
+        ENABLE: true # Set it to true to infer this model
+        CUSTOM_MODEL_FILE: 
+        NETWORK_CONFIG_FILE: 
+        AI_TASK: CUSTOM
+        DNN_PARAMS_PATH: 
+        INPUT:
+          IMAGES_DIR: 
+          LABELS_DIR:  #Annotation json file
+          TENSOR_DIR: 
+          START: 0 # Start offset for input tensors
+          END: 101 # End offset for input tensors
+          GEN_TENSOR: true
+          NORMALIZATION: []
+          INTERPOLATION: INTER_LINEAR
+          PRESERVE_ASPECT_RATIO: false
+          FRAME_RATE: 10
+          COPY_TENSORS_TO_EVB: true
+          # RASPI_MOUNT_INPUT_DIR: /data/input_tensor
+        OUTPUT_TENSORS:
+          DOWNLOAD_TENSORS: true
+          PPL_CALLBACK: false
+          # RASPI_MOUNT_OUTPUT_DIR: /data/output_tensor
+          BIN_PATH: 
+          JSON_PATH:

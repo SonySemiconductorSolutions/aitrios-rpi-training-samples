@@ -125,6 +125,7 @@ def _copy_with_progress(f_from, f_to, is_unc=True, bsize=0x8000):
                     break
                 w_to.write(block)
 
+
 def _download_with_progress(url, filename, csize=0x8000):
     _copy_with_progress(
         f_from=url,

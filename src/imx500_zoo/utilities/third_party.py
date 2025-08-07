@@ -15,7 +15,7 @@ def setup_path():
 
 def _add_path(p):
     ap = os.path.join(os.getcwd(), _DIR_ROOT, p)
-    if not ap in sys.path:
+    if ap not in sys.path:
         sys.path.insert(0, ap)
 
 
@@ -27,9 +27,7 @@ def setup_nanodet():
 
     curr = os.getcwd()
     os.chdir(os.path.join(_DIR_ROOT, _DIR_NANODET))
-    subprocess.run(
-        "git clone https://github.com/RangiLyu/nanodet.git", shell=True
-    )
+    subprocess.run("git clone https://github.com/RangiLyu/nanodet.git", shell=True)
     os.chdir(r"./nanodet")
     subprocess.run("git checkout pytorch2.0", shell=True)
     subprocess.run("python setup.py develop", shell=True)
@@ -40,7 +38,8 @@ def is_nanodet_cloned():
     try:
         pkg_resources.require(["nanodet"])
         ret = True
-    except:
+    except Exception as e:
+        print(f"Error is_nanodet_cloned() : {e}")
         ret = False
     return ret
 

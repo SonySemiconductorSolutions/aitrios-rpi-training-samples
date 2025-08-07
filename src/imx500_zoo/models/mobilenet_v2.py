@@ -16,12 +16,8 @@ class MobilenetV2:
 
         # get model from pytorch
         if pretrain == "True":
-            pretrain_weights = (
-                torchvision.models.MobileNet_V2_Weights.IMAGENET1K_V2
-            )
-            self.torch_model = torchvision.models.mobilenet_v2(
-                weights=pretrain_weights
-            )
+            pretrain_weights = torchvision.models.MobileNet_V2_Weights.IMAGENET1K_V2
+            self.torch_model = torchvision.models.mobilenet_v2(weights=pretrain_weights)
         else:
             self.torch_model = torchvision.models.mobilenet_v2()
 
@@ -54,7 +50,6 @@ class MobilenetV2:
         summary(self.torch_model, input_size=(1, 3, input_size, input_size))
 
     def export_onnx(self, target_path):
-
         input_size = int(self.config["MODEL"]["INPUT_SIZE"])
 
         self.torch_model.to("cpu")

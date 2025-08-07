@@ -5,13 +5,9 @@ from torchvision import transforms
 import torchvision
 import torch
 
-DOWNLOAD_DATASET = (
-    r"https://image-net.org/data/ILSVRC/2012/ILSVRC2012_img_val.tar"
-)
+DOWNLOAD_DATASET = r"https://image-net.org/data/ILSVRC/2012/ILSVRC2012_img_val.tar"
 
-DOWNLOAD_DEVKIT = (
-    r"https://image-net.org/data/ILSVRC/2012/ILSVRC2012_devkit_t12.tar.gz"
-)
+DOWNLOAD_DEVKIT = r"https://image-net.org/data/ILSVRC/2012/ILSVRC2012_devkit_t12.tar.gz"
 
 
 class ImageNet:

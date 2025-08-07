@@ -1,0 +1,73 @@
+{
+    "DATASET": {
+        "TYPE": "ARROW",
+        "NUM_KP": 7,
+        "KEYPOINTS": [
+            "Left",
+            "Middle left",
+            "Bottom left",
+            "Bottom right",
+            "Middle right",
+            "Right",
+            "Top"
+        ],
+        "KEYPOINTS_DICT": {
+            "0": "Left",
+            "1": "Middle left",
+            "2": "Bottom left",
+            "3": "Bottom right",
+            "4": "Middle right",
+            "5": "Right",
+            "6": "Top"
+        },
+        "RIGHT_KP": [5, 4, 3],
+        "LEFT_KP":  [0, 1, 2],
+        "EDGES": [
+            [0, 1],
+            [1, 2],
+            [2, 3],
+            [3, 4],
+            [4, 5],
+            [5, 6],
+            [6, 0]
+        ],
+        "NORM_FACTOR": 256.0,
+        "KP_RADIUS": 32,
+        "PEAK_THRESH": 0.004,
+        "OKS_THRESH": 0.5,
+        "kpt_oks_sigmas": [
+            0.14,
+            0.14,
+            0.14,
+            0.14,
+            0.14,
+            0.14,
+            0.14
+        ],
+        "NMS_THRESH": 32
+    },
+    "TRAINING": {
+        "OUTPUT_STRIDE": 16,
+        "LOSS_WEIGHTS": {
+            "heatmap": 4,
+            "short": 1,
+            "mid": 0.25
+        },
+        "MULTIPROCESSING_FLAG": "True",
+        "lr_decay_steps": 100, 
+        "lr_decay_rate": 0.95,
+        "earlystop_patience": 75,
+        "GPU_ID": 0
+    },
+    "PATH": {
+        "ANNO_FILE_TRAIN": "data/ArrowPosenet/arrow/arrow_train.json",
+        "IMG_DIR_TRAIN":   "data/ArrowPosenet/arrow/train",
+        "ANNO_FILE_VAL":   "data/ArrowPosenet/arrow/arrow_val.json",
+        "IMG_DIR_VAL":     "data/ArrowPosenet/arrow/val",
+        "ANNO_FILE_TEST":  "data/ArrowPosenet/arrow/arrow_val.json",
+        "IMG_DIR_TEST":    "data/ArrowPosenet/arrow/val"
+    },
+    "VISUALISE": {
+        "CONF_MAP_KEY": "Top"
+    }
+}

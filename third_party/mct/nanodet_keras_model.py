@@ -32,7 +32,6 @@ https://github.com/RangiLyu/nanodet
 """
 
 import numpy as np
-from keras.utils import plot_model
 from keras.utils import get_source_inputs
 from keras.layers import (
     Input,
