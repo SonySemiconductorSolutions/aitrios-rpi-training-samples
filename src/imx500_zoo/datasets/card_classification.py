@@ -60,49 +60,58 @@ class CardClassification:
     def _set_dataset_path(self):
         self.config["PATH"]["DATASET"] = self.train_path
 
+
+
     def setup_transform(self):
         input_width_size = int(self.config["MODEL"]["INPUT_SIZE"])
         input_height_size = int(input_width_size * 0.75)
         pad_width = int(input_width_size / 4 / 2)
 
+        # ini switch：default True
+        use_aug = self.config["DATASET"].get("AUGMENTATION", "True")
+        use_aug = str(use_aug).strip().lower() in ("1", "true", "yes", "y", "on")
+
+        base_tf = [
+            transforms.Resize((input_width_size, input_height_size)),
+            transforms.Pad((pad_width, 0, pad_width, 0), padding_mode="edge"),
+        ]
+
+        aug_tf = [
+            transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomVerticalFlip(p=0.5),
+            transforms.RandomAffine(
+                degrees=[-60, 60],
+                translate=(0.0, 0.0),
+                scale=(1.0, 2.0),
+            ),
+            transforms.RandomPerspective(distortion_scale=0.4, p=0.5),
+            transforms.RandomRotation(degrees=60),
+        ]
+
+        tail_tf = [
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225],
+            ),
+        ]
+
+        # train：
+        train_list = base_tf + (aug_tf if use_aug else []) + tail_tf
+        # valid：no augmentation
+        valid_list = base_tf + tail_tf
+
         self.transform = {
-            "train": transforms.Compose(
-                [
-                    transforms.Resize((input_width_size, input_height_size)),
-                    transforms.Pad(  # pad to resize to 224x224
-                        (pad_width, 0, pad_width, 0), padding_mode="edge"
-                    ),
-                    transforms.ColorJitter(
-                        brightness=0.5, contrast=0.5, saturation=0.5
-                    ),
-                    transforms.RandomHorizontalFlip(p=0.5),
-                    transforms.RandomVerticalFlip(p=0.5),
-                    transforms.RandomAffine(
-                        degrees=[-60, 60],
-                        translate=(0.0, 0.0),
-                        scale=(1.0, 2.0),
-                    ),
-                    transforms.RandomPerspective(distortion_scale=0.4, p=0.5),
-                    transforms.RandomRotation(degrees=60),
-                    transforms.ToTensor(),
-                    transforms.Normalize(
-                        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-                    ),
-                ]
-            ),
-            "valid": transforms.Compose(
-                [
-                    transforms.Resize((input_width_size, input_height_size)),
-                    transforms.Pad(  # pad to resize to 224x224
-                        (pad_width, 0, pad_width, 0), padding_mode="edge"
-                    ),
-                    transforms.ToTensor(),
-                    transforms.Normalize(
-                        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-                    ),
-                ]
-            ),
+            "train": transforms.Compose(train_list),
+            "valid": transforms.Compose(valid_list),
         }
+
+        print(f"[CardClassification] AUGMENTATION = {use_aug}")
+        print("[CardClassification] train transform =", self.transform["train"])
+        print("[CardClassification] valid transform =", self.transform["valid"])
+
+
 
     def get_loaders(self):
         return self.trainloader, self.validloader, self.imageloader

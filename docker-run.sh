@@ -7,5 +7,6 @@ docker run \
     -v /etc/group:/etc/group:ro \
     -v /home/$USER:/home/$USER \
     -w /work/samples \
+    -e PYTHONPATH=/work/src:$PYTHONPATH \
     imx500-zoo:latest \
     /bin/bash

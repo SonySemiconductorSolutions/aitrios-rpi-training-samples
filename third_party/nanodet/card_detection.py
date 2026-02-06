@@ -90,8 +90,16 @@ class CardDetection:
         return dir
 
     def _setup_augmentation(self):
-        return {
-            "train_a": albu.Compose(
+        # ini switch: default True
+        use_aug = self.config["DATASET"].get("AUGMENTATION", "True")
+        use_aug = str(use_aug).strip().lower() in ("1", "true", "yes", "y", "on")
+
+        bbox_params = albu.BboxParams(
+            format="pascal_voc", label_fields=["class_labels"]
+        )
+
+        if use_aug:
+            train_tf = albu.Compose(
                 [
                     albu.HorizontalFlip(p=0.5),
                     albu.VerticalFlip(p=0.5),
@@ -100,16 +108,26 @@ class CardDetection:
                     albu.HueSaturationValue(p=0.5),
                     albu.ElasticTransform(p=0.5),
                 ],
-                bbox_params=albu.BboxParams(
-                    format="pascal_voc", label_fields=["class_labels"]
-                ),  #            bbox_params=albu.BboxParams(format="coco", label_fields=["class_labels"])
-            ),
+                bbox_params=bbox_params,
+            )
+        else:
+            # augmentation OFF: only do necessary "non-random" processing (can be left empty = no bbox transformation)
+            train_tf = albu.Compose([], bbox_params=bbox_params)
+
+        # val_dataset.transform is not set in this code (kept as nanodet default/or inside CocoADataset)
+        self.config.nanodet.logger.info(f"[CardDetection] AUGMENTATION = {use_aug}")
+        self.config.nanodet.logger.info(f"[CardDetection] train_a = {train_tf}")
+
+        return {
+            "train_a": train_tf,
             "valid_a": albu.Compose(
                 [
                     albu.Normalize(),
                 ],
                 bbox_params=albu.BboxParams(
-                    format="coco", label_fields=["class_labels"]
+                    format="coco", label_fields=["class_labels"],
+                    min_visibility=0.0, 
                 ),
             ),
         }
+
