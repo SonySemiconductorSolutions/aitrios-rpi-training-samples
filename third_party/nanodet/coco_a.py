@@ -123,22 +123,41 @@ class CocoADataset(BaseDataset):
                 )
             else:
                 annotation["keypoints"] = np.zeros((0, 51), dtype=np.float32)
+                
         return annotation
 
+#--- updated version to handle various bbox shapes ---
     def _get_ann(self, orig, transformed):
-        bborig = transformed["bboxes"]
-        if bborig:
-            bb = transformed["bboxes"]
-            ll = transformed["class_labels"]
+        bb = transformed.get("bboxes", [])
+        ll = transformed.get("class_labels", [])
+
+        bbox = np.asarray(bb, dtype=np.float32)
+
+        # --- normalize bbox to always be (N, 4) ---
+        if bbox.size == 0:
+            bbox = bbox.reshape(0, 4)
+        elif bbox.ndim == 1:
+            # single bbox: (4,) -> (1,4)
+            if bbox.shape[0] != 4:
+                raise ValueError(f"Invalid bbox shape (1D): {bbox.shape}, bbox={bbox}")
+            bbox = bbox.reshape(1, 4)
         else:
-            bb = [0, 0, 0, 0]
-            ll = []
-        bbox = np.array(bb, dtype=np.float32)
+            # bbox.ndim == 2
+            if bbox.shape[1] != 4:
+                raise ValueError(f"Invalid bbox shape (2D): {bbox.shape}")
+
+        labels = np.asarray(ll, dtype=np.int64).reshape(-1,)
+
+        # Keep bbox/label count consistent
+        if bbox.shape[0] != labels.shape[0]:
+            raise ValueError(
+                f"bbox/label count mismatch: bboxes={bbox.shape}, labels={labels.shape}"
+            )
 
         orig["bboxes"] = bbox
-        orig["labels"] = np.array(ll, dtype=np.int64)
-
+        orig["labels"] = labels
         return orig
+
 
     def get_train_data(self, idx, is_train=True):
         """
@@ -156,12 +175,16 @@ class CocoADataset(BaseDataset):
                 "Cant load image! Please check image path!"
             )
         ann = self._get_img_annotation(idx)
+        if ann is None:
+            raise RuntimeError(f"ann is None: idx={idx}, file={file_name}")
 
         if is_train:
             if self.transform:
                 transformed = self.transform(
                     image=img, bboxes=ann["bboxes"], class_labels=ann["labels"]
                 )
+                if transformed is None:
+                    raise RuntimeError(f"transform returned None: idx={idx}, file={file_name}")
                 img = transformed["image"]
                 img_info["height"], img_info["width"] = img.shape[:2]
                 ann = self._get_ann(ann, transformed)

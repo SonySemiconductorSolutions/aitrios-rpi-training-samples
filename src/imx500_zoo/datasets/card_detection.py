@@ -143,7 +143,8 @@ class CardDetection:
                     albu.pytorch.ToTensorV2(),
                 ],
                 bbox_params=albu.BboxParams(
-                    format="coco", label_fields=["class_labels"]
+                    format="coco", label_fields=["class_labels"],
+                    min_visibility=0.0,
                 ),
             ),
             "valid": albu.Compose(
@@ -153,7 +154,8 @@ class CardDetection:
                     albu.pytorch.ToTensorV2(),
                 ],
                 bbox_params=albu.BboxParams(
-                    format="coco", label_fields=["class_labels"]
+                    format="coco", label_fields=["class_labels"],
+                    min_visibility=0.0,
                 ),
             ),
         }

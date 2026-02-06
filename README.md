@@ -39,10 +39,22 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-Install package.
+Install packages.
+
+1. Install the main packages.
 
 ``` bash
 pip install .
+```
+
+**Note:** If you encounter errors during installation, try using the `--no-cache-dir` option:
+``` bash
+pip install --no-cache-dir .
+```
+
+2. Install external library.
+
+``` bash
 pip install -e third_party/nanodet/nanodet
 ```
 
@@ -69,6 +81,9 @@ Once training and quantization are complete, a model is generated under samples/
     nanodet_plus_as_is.keras            : float model
     nanodet_plus_as_is_quantized.keras  : quantized model
 ```
+### INT8 quantization limitation:
+
+**Note:** Due to the IMX500 8 MB memory limit, large model input sizes may exceed the budget. A smaller model input size is recommended for deployment.
 
 ## Using Docker (Optional)
 
@@ -116,4 +131,3 @@ imx500_zoo nanodet_plus_as_is.ini
 
 ## See also
 - ["**FAQ**"](./FAQ.md)
-
