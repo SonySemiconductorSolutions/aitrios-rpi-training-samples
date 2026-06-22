@@ -1,6 +1,7 @@
 from imx500_zoo.utilities.download import (
     download_zip,
     download_file,
+    download_and_extract_tar,
 )
 from imx500_zoo.utilities.third_party import (
     setup_path,

@@ -6,6 +6,7 @@ import pathlib
 
 import re
 from tqdm import tqdm
+import tarfile
 
 
 from six.moves.urllib.request import urlopen
@@ -142,3 +143,29 @@ def _is_unc(pt):
 
 def _is_linux():
     return not platform.system().lower().__contains__("windows")
+
+
+def download_and_extract_tar(url, data_path, folder_name="VisA_20220922"):
+    target_name = f"{folder_name}.tar"
+    tar_path = os.path.join(data_path, target_name)
+
+    if not os.path.isfile(tar_path):
+        print(f"Downloading {folder_name} dataset to {tar_path}")
+        download_file(url, data_path, target_name=target_name)
+    else:
+        print(f"Skipped downloading {target_name} as it already exists")
+
+    extract_folder = os.path.join(data_path, folder_name)
+    if not os.path.isdir(extract_folder):
+        print(f"Extracting {target_name} to {extract_folder}")
+        os.makedirs(extract_folder, exist_ok=True)
+        if os.path.isfile(tar_path):
+            with tarfile.open(tar_path, 'r:*') as tar:
+                tar.extractall(path=extract_folder)
+            print(f"Extraction complete: {extract_folder}")
+        else:
+            raise FileNotFoundError(
+                f"Expected a tar file at {tar_path}, but could not find it."
+            )
+    else:
+        print(f"{extract_folder} already exists, skipping extraction.")

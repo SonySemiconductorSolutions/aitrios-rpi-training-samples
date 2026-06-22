@@ -7,3 +7,4 @@ from imx500_zoo.datasets.imagenet import ImageNet
 from imx500_zoo.datasets.arrow_posenet import ArrowPosenet
 from imx500_zoo.datasets.default_posenet import DefaultPosenet
 from imx500_zoo.datasets.card_segmentation import CardSegmentation
+from imx500_zoo.datasets.visa import VisA
