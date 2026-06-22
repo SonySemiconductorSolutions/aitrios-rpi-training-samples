@@ -65,26 +65,74 @@ class NanodetPlus:
 
     def _setup_cfg(self, cfg):
         cfg.defrost()
-
+        
+        # Training Parameters
         t = self.config["TRAINER"]
         cfg.schedule.total_epochs = int(t["NUM_EPOCHS"])
         cfg.device.batchsize_per_gpu = int(t["BATCH_SIZE"])
         cfg.device.workers_per_gpu = int(t["NUM_WORKERS"])
-
+        
+        # Model Architecture
+        m = self.config["MODEL"]
+        
+        # Backbone
+        if "BACKBONE_SIZE" in m:
+            cfg.model.arch.backbone.model_size = m["BACKBONE_SIZE"]
+        
+        if "BACKBONE_ACTIVATION" in m:
+            activation = m["BACKBONE_ACTIVATION"]
+            cfg.model.arch.backbone.activation = activation
+            cfg.model.arch.fpn.activation = activation
+            cfg.model.arch.head.activation = activation
+            cfg.model.arch.aux_head.activation = activation
+        
+        # FPN
+        if "FPN_KERNEL_SIZE" in m:
+            kernel = int(m["FPN_KERNEL_SIZE"])
+            cfg.model.arch.fpn.kernel_size = kernel
+            cfg.model.arch.head.kernel_size = kernel
+        
+        if "FPN_USE_DEPTHWISE" in m:
+            cfg.model.arch.fpn.use_depthwise = (m["FPN_USE_DEPTHWISE"].lower() == "true")
+        
+        if "FPN_NUM_EXTRA_LEVEL" in m:
+            cfg.model.arch.fpn.num_extra_level = int(m["FPN_NUM_EXTRA_LEVEL"])
+        
+        # Classes and Channels
         nclass = len(cfg.class_names)
         cfg.model.arch.head.num_classes = nclass
         cfg.model.arch.aux_head.num_classes = nclass
         self.config["MODEL"]["CLASS_NUM"] = f"{nclass}"
-
-        nchannel = int(self.config["MODEL"]["FEATURE_CHANNELS"])
+        
+        nchannel = int(m["FEATURE_CHANNELS"])
         cfg.model.arch.head.input_channel = nchannel
         cfg.model.arch.head.feat_channels = nchannel
         cfg.model.arch.fpn.out_channels = nchannel
         cfg.model.arch.aux_head.input_channel = nchannel * 2
-        cfg.model.arch.aux_head.input_channel = nchannel * 2
-
+        cfg.model.arch.aux_head.feat_channels = nchannel * 2
+        
+        # Learning Rate
         cfg.schedule.warmup.ratio = float(t["LEARNING_RATE"])
-
+        
+        # Loss Functions
+        if "LOSS" in self.config:
+            loss = self.config["LOSS"]
+            
+            if "QFL_BETA" in loss:
+                cfg.model.arch.head.loss.loss_qfl.beta = float(loss["QFL_BETA"])
+            
+            if "QFL_WEIGHT" in loss:
+                cfg.model.arch.head.loss.loss_qfl.loss_weight = float(loss["QFL_WEIGHT"])
+            
+            if "DFL_WEIGHT" in loss:
+                cfg.model.arch.head.loss.loss_dfl.loss_weight = float(loss["DFL_WEIGHT"])
+            
+            if "BBOX_LOSS_TYPE" in loss:
+                cfg.model.arch.head.loss.loss_bbox.name = loss["BBOX_LOSS_TYPE"]
+            
+            if "BBOX_LOSS_WEIGHT" in loss:
+                cfg.model.arch.head.loss.loss_bbox.loss_weight = float(loss["BBOX_LOSS_WEIGHT"])
+        
         cfg.freeze()
 
     def _set_classes_quantizer(self, num=-1, is_init=False):
@@ -111,3 +159,4 @@ class NanodetPlus:
 
         self.config.nanodet.args = args
         return args
+

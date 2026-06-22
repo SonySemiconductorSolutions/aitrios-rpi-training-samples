@@ -3,4 +3,5 @@ from third_party import (
     nanodet,
     keraspersonlab,
     tensorflow,
+    rd4ad,
 )

@@ -10,3 +10,4 @@ from imx500_zoo.validators.keras_posenet_validator import (
 from imx500_zoo.validators.keras_segmentation_validator import (
     KerasSegmentationValidator,
 )
+from imx500_zoo.validators.rd4ad_validator import RD4ADValidator

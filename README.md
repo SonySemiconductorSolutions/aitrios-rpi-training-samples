@@ -124,6 +124,17 @@ imx500_zoo nanodet_plus_as_is.ini
 |nanodet_plus_card.ini|object_detection|[card_detection](https://github.com/SonySemiconductorSolutions/aitrios-rpi-dataset-sample/blob/main/card_detection.zip)|nanodet_plus|☑|
 |posenet_arrow.ini|pose_estimation|[PersonLab](https://github.com/octiapp/KerasPersonLab/)|posenet|-|
 |deeplab_v3p_card.ini|semantic_segmentation|[card_segmentation](https://github.com/SonySemiconductorSolutions/aitrios-rpi-dataset-sample/blob/main/card_segmentation.zip)|deeplab_v3p|-|
+|rd4ad_visa.ini|anomaly_detection|[VisA](https://amazon-visual-anomaly.s3.us-west-2.amazonaws.com/VisA_20220922.tar)|rd4ad|☑|
+
+## Anomaly Detection
+
+Run the following command.  
+The anomalies in the test image are visualized.
+
+``` bash
+imx500_zoo rd4ad_visa.ini
+```
+![rd4ad_visualize_samples](samples/pretrained_weights/rd4ad/rd4ad_visualize_samples.png)
 
 ## License
 

@@ -2,3 +2,4 @@ from imx500_zoo.trainers.classification_trainer import ClassificationTrainer
 from imx500_zoo.trainers.nanodet_plus_trainer import NanodetPlusTrainer
 from imx500_zoo.trainers.posenet_trainer import PosenetTrainer
 from imx500_zoo.trainers.deeplab_v3p_trainer import DeeplabV3pTrainer
+from imx500_zoo.trainers.rd4ad_trainer import RD4ADTrainer
