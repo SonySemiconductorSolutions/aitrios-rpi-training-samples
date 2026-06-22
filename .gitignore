@@ -7,7 +7,7 @@ samples/data
 samples/model
 samples/results
 samples/lightning_logs
-samples/pretrained_weights
+# samples/pretrained_weights
 samples/workspace
 src/nanodet
 
