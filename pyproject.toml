@@ -17,7 +17,7 @@ dependencies = [
  'onnx==1.14.1',
  'onnxruntime==1.15.1',
  'onnxruntime-extensions==0.10.1',
- 'tensorflow==2.13.1',
+ 'tensorflow==2.15.1',
  'tensorflow-model-optimization==0.7.5',
  'tensorflow-addons==0.23.0',
  'pycocotools==2.0.7',
@@ -30,6 +30,7 @@ dependencies = [
  'PyYAML==6.0.2',
  'protobuf==3.20.3',
  'numpy==1.24.3',
+ 'pandas==2.3.3',
 ]
 
 [project.scripts]
