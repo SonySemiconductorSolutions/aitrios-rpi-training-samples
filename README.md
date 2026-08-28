@@ -58,6 +58,12 @@ pip install --no-cache-dir .
 pip install -e third_party/nanodet/nanodet
 ```
 
+> [!NOTE] 
+> If the external library installation does not proceed successfully, please install it using the following command:
+>```
+>python3 setup.py install
+>```
+
 ## Training and quantization
 
 Run the following command.  
